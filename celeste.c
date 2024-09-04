@@ -4,7 +4,7 @@
 #include <curses.h>
 //#include <curses.h>
 
-int fileread(char file[],long bytenum)
+int readfile(char file[],long bytenum)
 {
 FILE* fptr;
 fptr = fopen(file,"rb");
@@ -20,11 +20,12 @@ fclose(fptr);
 
 double playerx = 0;
 double playery = 0;
-grounded = 0;
-double xspeed;
-double yspeed;
-
-interactions()
+bool grounded = true;
+double xspeed = 0;
+double yspeed = 0;
+char prevlr = 'n';
+char prevud = 'n';
+void interactions()
 {
 	bool up = false;
 	bool down = false;
@@ -36,52 +37,198 @@ interactions()
 	bool demo = false;
 	bool reset = false;
 	if (readfile("tmp",0) == 49)
-		{
+	{
 			up = true;
-		}
+	}
 	if (readfile("tmp",1) == 49)
-		{
+	{
 			down = true;
-		}
+	}
 	if (readfile("tmp",2) == 49)
-		{
+	{
 			left = true;
-		}
+	}
 	if (readfile("tmp",3) == 49)
-		{
+	{
 			right= true;
-		}
+	}
 	if (readfile("tmp",4) == 49)
-		{
+	{
 			jump = true;
-		}
+	}
 	if (readfile("tmp",5) == 49)
-		{
+	{
 			dash = true;
-		}
+	}
 	if (readfile("tmp",6) == 49)
-		{
+	{
 			climb = true;
-		}
+	}
 	if (readfile("tmp",7) == 49)
-		{
+	{
 			demo = true;
-		}
+	}
 	if (readfile("tmp",8) == 49)
-		{
+	{
 			reset = true;
-		}
-	if (grounded == 1)
+	}
+
+//main dir determiner
+	char lr = 'n';
+	if (prevlr == 'l')
+	{
+		if (left)
 		{
-		if (xspeed > 10):
+				lr = 'l';
+		}
+		else
+		{
+			if (right)
 			{
-			xspeed = xspeed * 9 / 10;
+				lr = 'r';
 			}
-		if (xspeed < -10)
+			else
 			{
-			xspeed = xspeed * 9 / 10;
+				lr = 'n';
 			}
 		}
+	}
+	if (prevlr == 'r')
+	{
+		if (right)
+		{
+			lr = 'r';
+		}
+		else
+		{
+			if (left)
+			{
+				lr = 'l';
+			}
+			else
+			{
+				lr = 'n';
+			}
+		}
+	}
+	if (prevlr == 'n')
+	{
+		if (left)
+		{
+			if (right)
+			{
+				lr = 'n';
+			}
+			else 
+			{
+				lr = 'l';
+			}
+		}
+		else
+		{
+			if (right)
+			{
+				lr = 'r';
+			}
+			else
+			{
+				lr = 'n';
+			}
+		}
+	} 
+	prevlr = lr;
+	char ud = 'n';
+	if (prevud == 'u')
+	{
+		if (up)
+		{
+				ud = 'u';
+		}
+		else
+		{
+			if (down)
+			{
+				ud = 'd';
+			}
+			else
+			{
+				ud = 'n';
+			}
+		}
+	}
+	if (prevud == 'd')
+	{
+		if (down)
+		{
+			ud = 'd';
+		}
+		else
+		{
+			if (up)
+			{
+				ud = 'u';
+			}
+			else
+			{
+				ud = 'n';
+			}
+		}
+	}
+	if (prevud == 'n')
+	{
+		if (up)
+		{
+			if (down)
+			{
+				ud = 'n';
+			}
+			else 
+			{
+				ud = 'u';
+			}
+		}
+		else
+		{
+			if (down)
+			{
+				ud = 'd';
+			}
+			else
+			{
+				ud = 'n';
+			}
+		}
+	} 
+	prevud = ud;
+//actions determiner
+	if (grounded == true)
+	{
+		if (xspeed > 10)
+		{
+			xspeed = xspeed * 9 / 10;
+		}
+		if (xspeed < -10)
+		{
+			xspeed = xspeed * 9 / 10;
+		}
+		if (lr == 'r')
+		{
+			xspeed = 5;
+		}
+		if (lr == 'l')
+		{
+			xspeed = -5;
+		}
+		if (lr == 'n')
+		{
+			xspeed = 0;
+		}
+	
+		if (jump)
+		{
+			yspeed = 5;
+		}
+	}
 }
 
 long framecount()
@@ -93,7 +240,7 @@ return(fc);
 void game()
 {
 	
-
+	bool run = true;
 	while (run)
 	{
 
