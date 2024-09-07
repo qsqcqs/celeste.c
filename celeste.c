@@ -348,7 +348,6 @@ void movement(char horizontaldirection,char verticaldirection,bool jump,bool das
 		if (horizontaldirection == 'n')
 		{
 			maddie->xspeed = 0;
-=======
 				ud = 'd';
 			}
 			else
