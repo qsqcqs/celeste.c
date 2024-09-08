@@ -19,7 +19,22 @@ unsigned char b[1];
 //printf("\n");
 }
 
-
+char map[4000];
+struct inputs
+{
+	bool up;
+	bool down;
+	bool left;
+	bool right;
+	bool jump;
+	bool dash;
+	bool prevjump;
+	bool prevdash;
+	char xdir;
+	char ydir;
+	char prevxdir;
+	char prevydir;
+};
 struct player
 {
 	double playerx;
@@ -27,345 +42,350 @@ struct player
 	bool grounded;
 	double xspeed;
 	double yspeed;
-	char previoushorizontal;
-	char previousvertical;
-	bool prevjump;
-	bool prevdash;
+
 };
-char xdir(bool left,bool right,char previoushorizontal)
+//add switch statements maybe
+char xdir(struct inputs* inputptr)
 {
-	char horizontal = 'n';
-	if (previoushorizontal == 'l')
+	if (inputptr->prevxdir == -1)
 	{
-		if (left)
+		if (inputptr->left)
 		{
-				horizontal = 'l';
+				return(-1);
 		}
 		else
 		{
-			if (right)
+			if (inputptr->right)
 			{
-				horizontal = 'r';
+				return(1);
 			}
 			else
 			{
-				horizontal = 'n';
+				return(0);
 			}
 		}
 	}
-	if (previoushorizontal == 'r')
+	if (inputptr->prevxdir == 1)
 	{
-		if (right)
+		if (inputptr->right)
 		{
-			horizontal = 'r';
+			return(1);
 		}
 		else
 		{
-			if (left)
+			if (inputptr->left)
 			{
-				horizontal = 'l';
+				return(-1);
 			}
 			else
 			{
-				horizontal = 'n';
+				return(0);
 			}
 		}
 	}
-	if (previoushorizontal == 'n')
-	{
-		if (left)
-		{
-			if (right)
-			{
-				horizontal = 'n';
-			}
-			else 
-			{
-				horizontal = 'l';
-			}
-		}
-		else
-		{
-			if (right)
-			{
-				horizontal = 'r';
-			}
-			else
-			{
-				horizontal = 'n';
-			}
-		}
-	}
-	return(horizontal);
+	return((char)(inputptr->left) + (char)(inputptr->right));
 }
-char ydir(bool up, bool down,char previousvertical)
+char ydir(struct inputs* inputptr)
 {
-	char vertical = 'n';
-	if (previousvertical == 'u')
+	if (inputptr->prevydir == 1)
 	{
-		if (up)
+		if (inputptr->up)
 		{
-				vertical = 'u';
+				return(1);
 		}
 		else
 		{
-			if (down)
+			if (inputptr->down)
 			{
-				vertical = 'd';
+				return(-1);
 			}
 			else
 			{
-				vertical = 'n';
+				return(0);
 			}
 		}
 	}
-	if (previousvertical == 'd')
+	if (inputptr->prevydir == -1)
 	{
-		if (down)
+		if (inputptr->down)
 		{
-			vertical = 'd';
+			return(-1);
 		}
 		else
 		{
-			if (up)
+			if (inputptr->up)
 			{
-				vertical = 'u';
+				return(1);
 			}
 			else
 			{
-				vertical = 'n';
+				return(0);
 			}
 		}
 	}
-	if (previousvertical == 'n')
-	{
-		if (up)
-		{
-			if (down)
-			{
-				vertical = 'n';
-			}
-			else 
-			{
-				vertical = 'u';
-			}
-		}
-		else
-		{
-			if (down)
-			{
-				vertical = 'd';
-			}
-			else
-			{
-				vertical = 'n';
-			}
-		}
-	}
-	return(vertical);
+	return((char)(inputptr->up) + (char)(inputptr->down));
 }
-void movement(char xdir,char ydir,bool jump,bool dash,struct player* maddie)
+void friction(struct inputs* inputptr,struct player* maddieptr)
 {
-	if (maddie->grounded)
+	if (maddieptr->grounded)
 	{
-		if (maddie->xspeed > 5)
+		if (maddieptr->xspeed > 5)
 		{
-			maddie->xspeed = maddie->xspeed * 9 / 10 - 5;
+			maddieptr->xspeed = maddieptr->xspeed * 9 / 10 - 5;
 		}
-		if (maddie->xspeed < -5)
+		if (maddieptr->xspeed < -5)
 		{
-			maddie->xspeed = maddie->xspeed * 9 / 10 + 5;
+			maddieptr->xspeed = maddieptr->xspeed * 9 / 10 + 5;
 		}
-		if (maddie->xspeed >= -5 && maddie->xspeed <= 5)
+		if (maddieptr->xspeed >= -5 && maddieptr->xspeed <= 5)
 		{
-			maddie->xspeed = 0;
+			maddieptr->xspeed = 0;
 		}
-		if (xdir == 'r')
-		{
-			maddie->xspeed = 5;
-		}
-		if (xdir == 'l')
-		{
-			maddie->xspeed = -5;
-		}
-		if (xdir == 'n')
-		{
-			maddie->xspeed = 0;
-		}
-	
-		if (jump)
-		{
-			maddie->prevjump = true;
-			if (!maddie->prevjump)
-			{
-				maddie->yspeed = 20;
-			}
-		}
-		else
-		{
-			maddie->prevjump = false;
-		}
-	}
-	else 
-	{
-		if (maddie->yspeed > -10)
-		{
-		maddie->yspeed=maddie->yspeed-1;
-		}
-
-		if (ydir = 'd')
-		{
-			maddie->yspeed = maddie->yspeed - 1;
-		}
-		else
-		{
-			if (maddie->yspeed < -10)
-			{
-				maddie->yspeed = -10;
-			}
-		}
-		if (xdir = 'r')
-		{
-			if (maddie->xspeed < 0)
-			{
-				maddie->xspeed = .95 * maddie->xspeed + 5;
-			}
-			else
-			{
-				if (maddie->xspeed < 5)
-				{
-					maddie->xspeed = 5;
-				}
-			}
-		}
-		if (xdir = 'l')
-		{
-			if (maddie->xspeed > 0)
-			{
-				maddie->xspeed = .95 * maddie->xspeed - 5;
-			}
-			else
-			{
-				if (maddie->xspeed > -5)
-				{
-					maddie->xspeed = -5;
-				}
-			}
-		}
-		if (xdir = 'n')
-		{
-			if (maddie->xspeed > 5 || maddie->xspeed < -5)
-			{
-				maddie->xspeed = .95 * maddie->xspeed;
-			}
-		}
-	}
-	if (dash)
-	{
-		if (!maddie->prevdash)
-		{
-			if (xdir == 'n' && ydir == 'n')
-				xdir == maddie->previoushorizontal;
-				ydir == maddie->previousvertical;
-			if (ydir == 'n')
-			{
-				if (xdir == 'r')
-				{
-					if (maddie->xspeed < 0)
-					{
-						maddie->xspeed = maddie->xspeed * 1.2;
-					}
-					maddie->xspeed = maddie->xspeed + 5;
-				}
-				else
-				{
-					if (maddie->xspeed > 0)
-					{
-						maddie->xspeed = maddie->xspeed + 1.2;
-					}
-					maddie->xspeed = maddie->xspeed -5;
-				}
-			}
-			else
-			{
-				if (xdir == 'n')
-				{
-					if (ydir = 'u')
-					{
-						maddie->yspeed = maddie->yspeed + 5;
-					}
-					else
-					{
-						maddie->yspeed = maddie->yspeed - 5;
-					}
-				}
-				else
-				{
-					if (ydir == 'u')
-					{
-						if (xdir = 'r')
-						{
-							if (maddie->xspeed > 0)
-							{
-								maddie->xspeed = 1.2 * maddie->xspeed;
-							}
-							maddie->xspeed = maddie->xspeed + 3.54;
-						}
-						else
-						{
-							if (maddie->xspeed < 0)
-							{
-								maddie->xspeed = 1.2 * maddie->xspeed;
-							}
-						}
-
-					maddie->yspeed = maddie->yspeed + 3.54;
-					}
-					else
-					{
-						if (xdir = 'r')
-						{
-							if (maddie->xspeed > 0)
-							{
-								maddie->xspeed = 1.2 * maddie->xspeed;
-							}
-							maddie->xspeed = maddie->xspeed + 3.54;
-						}
-						else
-						{
-							if (maddie->xspeed < 0)
-							{
-								maddie->xspeed = 1.2 * maddie->xspeed;
-							}
-						}
-					maddie->yspeed = maddie->yspeed - 3.54;
-					}
-				}
-			}
-		}
-		maddie->prevdash = true;
 	}
 	else
 	{
-		maddie->prevdash = false;
+		if (inputptr->xdir = 1)
+		{
+			if (maddieptr->xspeed < 0)
+			{
+				maddieptr->xspeed = .95 * maddieptr->xspeed + 5;
+			}
+			else
+			{
+				if (maddieptr->xspeed < 5)
+				{
+					maddieptr->xspeed = 5;
+				}
+			}
+		}
+		if (inputptr->xdir = -1)
+		{
+			if (maddieptr->xspeed > 0)
+			{
+				maddieptr->xspeed = .95 * maddieptr->xspeed - 5;
+			}
+			else
+			{
+				if (maddieptr->xspeed > -5)
+				{
+					maddieptr->xspeed = -5;
+				}
+			}
+		}
+		if (inputptr->xdir = 0)
+		{
+			if (maddieptr->xspeed > 5 || maddieptr->xspeed < -5)
+			{
+				maddieptr->xspeed = .95 * maddieptr->xspeed;
+			}
+		}
+	}
+}
+void jumpphys(struct inputs* inputptr,struct player* maddieptr)
+{
+	if (maddieptr->grounded && inputptr -> jump)
+	{
+		inputptr->prevjump = true;
+		if (!inputptr->prevjump)
+		{
+			maddieptr->yspeed = 20;
+		}
+	}
+	else
+	{
+		inputptr->prevjump = false;
+	}
+}
+void dashphys(struct inputs* inputptr,struct player* maddieptr)
+{
+	if (!inputptr->prevdash)
+		{
+			if (inputptr->xdir == 0 && inputptr->ydir == 0)
+				inputptr->xdir == inputptr->prevxdir;
+				inputptr->ydir == inputptr->prevydir;
+			if (inputptr->ydir == 0)
+			{
+				if (inputptr->xdir == 1)
+				{
+					if (maddieptr->xspeed < 0)
+					{
+						maddieptr->xspeed = maddieptr->xspeed * 1.2;
+					}
+					maddieptr->xspeed = maddieptr->xspeed + 5;
+				}
+				else
+				{
+					if (maddieptr->xspeed > 0)
+					{
+						maddieptr->xspeed = maddieptr->xspeed + 1.2;
+					}
+					maddieptr->xspeed = maddieptr->xspeed -5;
+				}
+			}
+			else
+			{
+				if (inputptr->xdir == 0)
+				{
+					if (inputptr->ydir = 1)
+					{
+						maddieptr->yspeed = maddieptr->yspeed + 5;
+					}
+					else
+					{
+						maddieptr->yspeed = maddieptr->yspeed - 5;
+					}
+				}
+				else
+				{
+					if (inputptr->ydir == 1)
+					{
+						if (inputptr->xdir = 1)
+						{
+							if (maddieptr->xspeed > 0)
+							{
+								maddieptr->xspeed = 1.2 * maddieptr->xspeed;
+							}
+							maddieptr->xspeed = maddieptr->xspeed + 3.54;
+						}
+						else
+						{
+							if (maddieptr->xspeed < 0)
+							{
+								maddieptr->xspeed = 1.2 * maddieptr->xspeed;
+							}
+						}
+
+					maddieptr->yspeed = maddieptr->yspeed + 3.54;
+					}
+					else
+					{
+						if (inputptr->xdir = 1)
+						{
+							if (maddieptr->xspeed > 0)
+							{
+								maddieptr->xspeed = 1.2 * maddieptr->xspeed;
+							}
+							maddieptr->xspeed = maddieptr->xspeed + 3.54;
+						}
+						else
+						{
+							if (maddieptr->xspeed < 0)
+							{
+								maddieptr->xspeed = 1.2 * maddieptr->xspeed;
+							}
+						}
+					maddieptr->yspeed = maddieptr->yspeed - 3.54;
+					}
+				}
+			}
+		}
+		inputptr->prevdash = true;
+}
+void xdirhold(struct inputs* inputptr,struct player* maddieptr)
+{
+	if (maddieptr->grounded)
+	{
+		if (inputptr->xdir == 1)
+		{
+			maddieptr->xspeed = 5;
+		}
+		if (inputptr->xdir == -1)
+		{
+			maddieptr->xspeed = -5;
+		}
+		if (inputptr->xdir == 0)
+		{
+			maddieptr->xspeed = 0;
+		}
+	}
+	else
+	{
+		if (inputptr->xdir == 1)
+		{
+			maddieptr->xspeed + 1;
+			if (maddieptr->xspeed > 5)
+			{
+				maddieptr->xspeed = 5;
+			}
+		}
+		if (inputptr->xdir == -1)
+		{
+			maddieptr->xspeed - 1;
+			if (maddieptr->xspeed < -5)
+			{
+				maddieptr->xspeed = -5;
+			}
+			
+		}
+		if (inputptr->xdir == 0)
+		{
+			if (maddieptr->xspeed > -1)
+			{	if (maddieptr->xspeed < 1)
+				{
+					maddieptr->xspeed = 0;
+				}
+				maddieptr->xspeed = maddieptr->xspeed - 1;
+			}
+			else
+			{
+				if (maddieptr->xspeed < 1)
+				{
+					maddieptr->xspeed = maddieptr->xspeed + 1;
+				}
+			}
+		
+		}
+	}
+}
+void gravity(struct inputs* inputptr,struct player* maddieptr)
+{
+	if (maddieptr->yspeed > -10)
+	{
+	maddieptr->yspeed=maddieptr->yspeed-1;
+	}
+	if (inputptr->ydir = -1)
+	{
+		maddieptr->yspeed = maddieptr->yspeed - 1;
+	}
+	else
+	{
+		if (maddieptr->yspeed < -10)
+		{
+			maddieptr->yspeed = -10;
+		}
+	}
+}
+void movement(struct inputs* inputptr,struct player* maddieptr)
+{
+	friction(inputptr,maddieptr);
+	jumpphys(inputptr,maddieptr);
+	xdirhold(inputptr,maddieptr);
+	if (inputptr->dash)
+	{
+		dashphys(inputptr,maddieptr);
+	}
+	else
+	{
+		inputptr->prevdash = false;
 	}
 
 }
 
-void interactions(struct player* maddyptr,bool* run)
+void interactions(struct inputs* inputptr,struct player* maddyptr,bool* run)
 {
 
 	//nobody shall see these horrors
-	bool up = readfile("tmp",0);
-	bool down = readfile("tmp",1);
-	bool left = readfile("tmp",2);
-	bool right = readfile("tmp",3);
-	bool jump = readfile("tmp",4);
-	bool dash = readfile("tmp",5);
-	char horizontal = xdir(left,right,maddyptr->previoushorizontal);
-	char vertical = ydir(up,down,maddyptr->previousvertical);
-	if (horizontal != 'n' || vertical != 'n'){maddyptr->previousvertical = vertical;maddyptr->previoushorizontal = horizontal;}
-	movement(horizontal,vertical,jump,dash,maddyptr);
+
+	inputptr->up = (bool)readfile("tmp",0);
+	inputptr->down = (bool)readfile("tmp",1);
+	inputptr->left = (bool)readfile("tmp",2);
+	inputptr->right = (bool)readfile("tmp",3);
+	inputptr->jump = (bool)readfile("tmp",4);
+	inputptr->dash = (bool)readfile("tmp",5);
+	inputptr->xdir = xdir(inputptr);
+	inputptr->ydir = ydir(inputptr);
+	if (inputptr->xdir != 0 || inputptr->ydir != 0){inputptr->prevydir = inputptr->ydir;inputptr->prevxdir = inputptr->xdir;}
+	movement(inputptr,maddyptr);
 }
 
 long framecount()
@@ -384,14 +404,16 @@ void game()
 	maddy.grounded = true;
 	maddy.xspeed = 0;
 	maddy.yspeed = 0;
-	maddy.previoushorizontal = 'n';
-	maddy.previousvertical = 'n';
-	maddy.prevjump = false;
-	maddy.prevdash = false;
+
+	struct inputs input;
+	input.prevxdir = 0;
+	input.prevydir = 0;
+	input.prevjump = false;
+	input.prevdash = false;
 	run = true;
 	while (run)
 	{
-		interactions(&maddy,&run);
+		interactions(&input,&maddy,&run);
 		framecount();
 	}
 }
