@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <curses.h>
+#include <math.h>
 //#inclxdire <curses.h>
 
 char readfile(char file[],long bytenum)
@@ -44,201 +45,36 @@ struct player
 	double yspeed;
 
 };
-die(){/*to do*/}
-
-int getblock(x,y)
+void die(){/*to do*/}
+//implement one ways
+int getblock(int x,int y)
 {
 	return map[x + 80 * y];
 }
-void pixrender(x,y){/*oh god please no*/
+void pixdataget(int x,int y){/*oh god please no*/
 /*
-characters for this shit
-^vpbBd89 for spikes
-X for blocks
+
 blue for blocks, white for spikes
 */
-switch (getblock(x,2*y) + 8 * getblock(x,2*y+1))
-{
-	case 0:
-		printf(' ');
-		break;
-	case 1:
-		printf('x');
-		break;
-	case 2:
-		printf('n');
-		break;
-	case 3:
-		printf('v');
-		break;
-	case 4:
-		printf('d');
-		break;
-	case 5:
-		printf('b');
-		break;
-	case 6:
-		//lava not implemented
-		break;
-	case 7:
-		//ice not implemented
-		break;
-	case 8:
-		printf('*');
-		break;
-	case 9:
-		printf('X');
-		break;
-	case 10:
-		//bruh this is a spike pointing at a block
-		break;
-	case 11:
-		printf('V');
-		break;
-	case 12:
-		printf('d');
-		break;
-	case 13:
-		printf('b');
-		break;
-	case 14:
-		//lava not implemented
-		break;
-	case 15:
-		//ice not implemented
-		break;
-	case 16:
-			printf('^');
-		break;
-	case 17:
-			printf('A');
-		break;
-	case 18:
-		printf('M');
-		break;
-	case 19:
-		printf('N');
-		break;
-	case 20://20 is fine-ish, 21 is iffier
-		printf('&');
-		break;
-	case 21:
-		printf('&');
-		break;
-	case 22:
-		//lava not implemented
-		break;
-	case 23:
-		//ice not implemented
-		break;
-	case 24:
-		printf('Y');
-		break;
-	case 25:
-		//spike into a block again?
-		break;
-	case 26: //26 and 27 are such a compromise
-		printf('<');
-		break;
-	case 27:
-		printf('<');
-		break;
-	case 28:
-		printf('<');
-		break;
-	case 29:
-		printf('Z');
-		break;
-	case 30:
-		//lava not implemented
-		break;
-	case 31:
-		//ice not implemented
-		break;
-	case 32:
-		printf('9');
-		break;
-	case 33:
-		printf('9');
-		break;
-	case 34://more compromises for 34 35
-		printf('<');
-		break;
-	case 35:
-		printf('<');
-		break;
-	case 36:
-		printf('<');
-		break;
-	case 37:
-		printf('Z');
-		break;
-	case 38:
-		//lava not implemented
-		break;
-	case 39:
-		//ice not implemented
-		break;
-	case 40:
-		printf('p');
-		break;
-	case 41:
-		printf('p');
-		break;
-	case 42://compromises for 42 43
-		printf('>');
-		break;
-	case 43:
-		printf('>');
-		break;
-	case 44:
-		printf('Z');
-		break;
-	case 45:
-		printf('>');
-		break;
-		//a lot of lava and ice not implemented
-	case 46:
-		break;
-	case 47:
-		break;
-	case 48:
-		break;
-	case 49:
-		break;
-	case 50:
-		break;
-	case 51:
-		break;
-	case 52:
-		break;
-	case 53:
-		break;
-	case 54:
-		break;
-	case 55:
-		break;
-	case 56:
-		break;
-	case 57:
-		break;
-	case 58:
-		break;
-	case 59:
-		break;
-	case 60:
-		break;
-	case 61:
-		break;
-	case 62:
-		break;
-	case 63:
-		break;
+char spritesheet[] = {
+//         1   2   3   4   5   6   7   8   9   0   1   2
+/*empty */' ','x','n','v','d','b',' ',' ',' ',' ',' ',' ',
+/*block */'*','X',' ','V','d','b',' ',' ',' ',' ',' ',' ',
+/*spup  */'^','A','M','N','&','&',' ',' ',' ',' ',' ',' ',
+/*spdwn */'Y',' ','<','<','<','Z',' ',' ',' ',' ',' ',' ',
+/*splft */'9','9','<','<','<','Z',' ',' ',' ',' ',' ',' ',
+/*sprht */'P','P','>','>','Z','>',' ',' ',' ',' ',' ',' ',
+/*lava  */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+/*ice   */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+/*owup  */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+/*owdown*/' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+/*owleft*/' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+/*owrht */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '
 };
-
+//print(spritesheet[getblock(x,2*y) + 12 * getblock(x,2*y+1)]);
 
 }
-render(){}
+void render(){}
 void collide(struct player* maddyptr)
 {
 	/*
