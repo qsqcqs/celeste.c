@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <curses.h>
-#include <math.h>
 //#inclxdire <curses.h>
 
 char readfile(char file[],long bytenum)
@@ -46,35 +45,152 @@ struct player
 
 };
 void die(){/*to do*/}
-//implement one ways
+//implement one ways properly
+double fmod(double a,double b)
+{
+	
+	while(a < 0 || a > b)
+	{
+		if (a < 0)
+		{
+			a += b;
+		}
+		else
+		{
+			a -= b;
+		}
+	}
+}
 int getblock(int x,int y)
 {
 	return map[x + 80 * y];
 }
-void pixdataget(int x,int y){/*oh god please no*/
+int colread(char chr)
+{
+	switch(chr)
+	{
+		case 'k':
+			return(COLOR_BLACK);
+			break;
+		case 'r':
+			return(COLOR_RED);
+			break;
+		case 'g':
+			return(COLOR_GREEN);
+			break;
+		case 'y':
+			return(COLOR_YELLOW);
+			break;
+		case 'b':
+			return(COLOR_BLUE);
+			break;
+		case 'm':
+			return(COLOR_MAGENTA);
+			break;
+		case 'c':
+			return(COLOR_MAGENTA);
+			break;
+		case 'w':
+			return(COLOR_WHITE);
+			break;
+
+	}
+		
+}
+void colinit()
+{
+	init_pair(0,COLOR_BLACK, COLOR_WHITE);
+	init_pair(1,COLOR_BLACK,COLOR_BLACK);
+	init_pair(3,COLOR_BLACK,COLOR_YELLOW);
+	init_pair(26,COLOR_BLUE,COLOR_BLUE);
+}
+void colman(char bg,char fg)
+{
+	int bgint = colread(bg);
+	int fgint = colread(fg);
+	attron(COLOR_PAIR(bgint+fgint*8));
+}
+void pixrender(int x,int y){/*oh god please no*/
 /*
 
+b blue
+r red
+w white
+k black
 blue for blocks, white for spikes
 */
+char fku = 'f';
 char spritesheet[] = {
-//         1   2   3   4   5   6   7   8   9   0   1   2
-/*empty */' ','x','n','v','d','b',' ',' ',' ',' ',' ',' ',
-/*block */'*','X',' ','V','d','b',' ',' ',' ',' ',' ',' ',
-/*spup  */'^','A','M','N','&','&',' ',' ',' ',' ',' ',' ',
-/*spdwn */'Y',' ','<','<','<','Z',' ',' ',' ',' ',' ',' ',
-/*splft */'9','9','<','<','<','Z',' ',' ',' ',' ',' ',' ',
-/*sprht */'P','P','>','>','Z','>',' ',' ',' ',' ',' ',' ',
+//         0   1   2   3   4   5   6   7   8   9   0   1
+/*empty */' ','x','n','v','d','b',' ',' ','-','_','[',']',
+/*block */'*','X',fku,'V','d','b',' ',' ',fku,fku,'[',']',
+/*spup  */'^','A','M','N','&','&',' ',' ','A',fku,'P','9',
+/*spdwn */'Y',fku,'<','<','<','Z',' ',' ',fku,fku,fku,fku,
+/*splft */'9','9','<','<','<','Z',' ',' ','<','<','<',fku,
+/*sprht */'P','P','>','>','Z','>',' ',' ','>','>',fku,'>',
 /*lava  */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
 /*ice   */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
-/*owup  */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
-/*owdown*/' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
-/*owleft*/' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
-/*owrht */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '
+/*owup  */'~','~',fku,'T','Z','Z',' ',' ','~',fku,'[',']',
+/*owdown*/'-','x','7','v','z','z',' ',' ','-','=','[',']',
+/*owleft*/'[','[','9','Y','<','<',' ',' ','[','L','[','|',
+/*owrht */']','h','R','j','>','>',' ',' ','[',']','|',']'
 };
-//print(spritesheet[getblock(x,2*y) + 12 * getblock(x,2*y+1)]);
+char bgsheet[] = {
+//         0   1   2   3   4   5   6   7   8   9   0   1
+/*empty */'k','b','k','k','k','k','k','k','k','k','k','k',
+/*block */'b','b',fku,'k','k','k','k','k',fku,fku,'k','k',
+/*spup  */'k','k','k','k','k','k','k','k','k','k','k','k',
+/*spdwn */'k',fku,'k','k','k','k','k','k',fku,fku,fku,fku,
+/*splft */'k','k','k','k','k','k','k','k','k','k','k',fku,
+/*sprht */'k','k','k','k','k','k','k','k','k','k',fku,'k',
+/*lava  */'k','k','k','k','k','k','k','k','k','k','k','k',
+/*ice   */'k','k','k','k','k','k','k','k','k','k','k','k',
+/*owup  */'k','k',fku,'k','k','k','k','k','k',fku,'k','k',
+/*owdown*/'k','k','k','k','k','k','k','k','k','k','k','k',
+/*owleft*/'k','k','k','k','k','k','k','k','k','k','k','k',
+/*owrht */'k','k','k','k','k','k','k','k','k','k','k','k',
+};
+char fgsheet[] = {
+//         0   1   2   3   4   5   6   7   8   9   0   1
+/*empty */'k','b','w','w','w','w',' ',' ','y','y','y','y',
+/*block */'b','b',fku,'w','w','w',' ',' ',fku,fku,'y','y',
+/*spup  */'w','w','w','w','w','w',' ',' ','y',fku,'y','y',
+/*spdwn */'w',fku,'w','w','w','w',' ',' ',fku,fku,fku,fku,
+/*splft */'w','w','w','w','w','w',' ',' ','y','y','y',fku,
+/*sprht */'w','w','w','w','w','w',' ',' ','y','y',fku,'y',
+/*lava  */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+/*ice   */' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+/*owup  */'y','y',fku,'y','y','y',' ',' ','y',fku,'y','y',
+/*owdown*/'y','y','y','y','y','y',' ',' ','-','y','y','y',
+/*owleft*/'y','[','y','Y','y','y',' ',' ','y','y','y','y',
+/*owrht */'y','h','y','y','y','y',' ',' ','y','y','y','y'
+};
 
+int pos = getblock(x,2*y) + 12 * getblock(x,2*y+1);
+colman(bgsheet[pos],fgsheet[pos]);
+char cstr[2] = "\0";
+cstr[0] = spritesheet[pos];
+addstr(cstr);
 }
-void render(){}
+void render()
+{
+	int y = 24;
+	int x;
+	while (y >= 0)
+	{
+		x = 0;
+		while(x < 80)
+		{
+			pixrender(x,y);
+		}
+		if (y > 0)
+		{
+			addstr("\n");
+		}
+		y--;
+	}
+		
+}
 void collide(struct player* maddyptr)
 {
 	/*
@@ -567,20 +683,22 @@ void game()
 	input.prevjump = false;
 	input.prevdash = false;
 	run = true;
+	colinit();
 	while (run)
 	{
 		interactions(&input,&maddy,&run);
+		render();
 		framecount();
 	}
 }
 int main()
 {
-initscr();
-start_color();
+	initscr();
+	start_color();
 
-game();
-endwin();
-return(0);
+	game();
+	endwin();
+	return(0);
 
 }
 /*
